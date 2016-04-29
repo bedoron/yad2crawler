@@ -8,15 +8,16 @@ ITERATION_SLEEP_SEC =   60*15       # 15 min
 LOCATIONS = [
     (32.080584, 34.780591, 0.7, "Rabin square"),
     (32.072375, 34.779196, 0.7, "Bima square"),
+    (32.087498, 34.787711, 10, "Kikar hamedina")
 ]
 # OSVersion	5.0.2
 crawl_parameters = {
     "CatID": 2,             # apartment
-    "CityID": 1800.0,
-    "SubCatID": 2,          # rent
+    "CityID": 1800.0,       # Tel Aviv city
+    "SubCatID": 2,          # rent (1 for sale 2 for rent)
 #    "AreaID": 48,           # tlv centers
     "HomeTypeID": 1.0,
-    "FromRooms": 2,         # min rooms
+    "FromRooms": 2.0,         # min rooms
     "ToRooms": 2.5,         # max rooms
     "FromPrice": 4000,      # min price
     "ToPrice": 6000,        # max price
@@ -46,12 +47,13 @@ file_notifier = {
 }
 
 # Selected notifier
+
+# Mail notifier
 # notifier_settings  = mail_notifier
 #notifier = getattr(importlib.import_module("notifiers.mail_notifier"), 'MailNotifier')
-
+# File writer notifier
 notifier_settings = file_notifier
 notifier = getattr(importlib.import_module("notifiers.file_notifier"), 'FileNotifier')
-
 
 # Log
 LOG_LEVEL = DEBUG
