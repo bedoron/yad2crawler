@@ -3,6 +3,7 @@ from logging import DEBUG, INFO, WARN, ERROR
 
 # Crawl settings
 ITERATION_SLEEP_SEC =   60*15       # 15 min
+ITERATION_SLEEP_SEC_ERROR = 5 * 60  # 5 minutes wait on error
 
 # Locations (latitude, longitude, radius, name)
 LOCATIONS = [

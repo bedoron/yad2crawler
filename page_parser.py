@@ -1,4 +1,8 @@
+import urllib
+from urllib2 import Request, urlopen
+
 from bs4                import BeautifulSoup
+import urlparse
 
 template = ur"""
 <html>
@@ -23,9 +27,20 @@ styles_options = "margin-top: 10px; font-family: verdana,arial,sans-serif; font-
 styles_options_th = "background:#b5cfd2 url('http://www.textfixer.com/img/cell-blue.jpg'); border-width: 1px; padding: 8px; border-style: solid; border-color: #999999;"
 styles_options_td = "background:#dcddc0 url('http://www.textfixer.com/img/cell-grey.jpg'); border-width: 1px; padding: 8px; border-style: solid; border-color: #999999;"
 
+gallery_address = 'http://www.yad2.co.il/Nadlan/ViewImage.php'
+
 class PageParser(object):
     def __init__(self, html):
         self.soup = BeautifulSoup(html, "html.parser")
+        target_params = self.soup.find("a", {"href": lambda l: l and "PicGallery" in l}).get("href")
+        self.ad_qs = urlparse.urlsplit(target_params).query # urlparse.parse_qs(urlparse.urlsplit(target_params).query)
+
+    def extract_image_links(self):
+        gallery_url = "{}?{}".format(gallery_address, self.ad_qs)
+        req = Request(gallery_url)
+        response = urlopen(req)
+
+        return response.read()
 
     def get_div(self, cls, src=None):
         src = src or self.soup
@@ -95,6 +110,7 @@ class PageParser(object):
         return page.replace("%OPTIONS%", html)
 
     def create_apartment_page(self, url):
+        self.extract_image_links()
         page = template
         page = self.add_imgs(page, url)
         page = self.add_details(page)
