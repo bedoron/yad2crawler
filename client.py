@@ -34,7 +34,11 @@ class Yad2Client(object):
         headers["Accept-Language"] = "en-US"
 
         args = args or {}
-        args["AppVersion"] = "10"
+        args["DeviceType"] = "Redmi Note 3"
+        args["AppVersion"] = "2.9"
+        args["AppType"] = "Android"
+        args["OSVersion"] = "5.0.2"
+        args["udid"] = "582ffa3d-a4cf-425a-8b36-9874d7464015"
                 
         url = url + "?" + urlencode(args)
         req = Request(url, headers = headers)

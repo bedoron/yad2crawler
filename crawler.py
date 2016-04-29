@@ -164,8 +164,8 @@ class Yad2Crawler(object):
                     data = self.get_page(page)
                     json = loads(data)
 
-                    for type in filter(lambda x: x in json and 'Result' in json[x], self.apartment_type):
-                        self.log.info(".. Checking {} apartments...", type)
+                    for type in filter(lambda x: x in json and 'Results' in json[x], self.apartment_type):
+                        self.log.info(".. Checking %s apartments...", type)
                         self.crawl_apartments(json[type]['Results'])
 
                     more = True if json['MoreResults'] == 1 else False

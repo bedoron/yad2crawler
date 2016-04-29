@@ -25,7 +25,7 @@ styles_options_td = "background:#dcddc0 url('http://www.textfixer.com/img/cell-g
 
 class PageParser(object):
     def __init__(self, html):
-        self.soup = BeautifulSoup(html)
+        self.soup = BeautifulSoup(html, "html.parser")
 
     def get_div(self, cls, src=None):
         src = src or self.soup
