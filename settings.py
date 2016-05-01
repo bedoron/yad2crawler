@@ -44,7 +44,7 @@ mail_notifier = {
 }
 
 file_notifier = {
-    'file_path': 'output.csv'
+    'file_path': 'output.xlsx'
 }
 
 # Selected notifier
@@ -63,6 +63,6 @@ LOG_FORMAT = "%(asctime)s [%(levelname)-5.5s]  %(message)s"
 
 # Proxy
 PROXY = {
-     "http":  "localhost:8888",
-     "https": "localhost:8888",
+#     "http":  "localhost:8888",
+#     "https": "localhost:8888",
 }

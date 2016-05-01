@@ -1,17 +1,16 @@
-from datetime           import datetime
-from itertools          import ifilter
-from json               import loads
-from time               import sleep
+from datetime import datetime
+from itertools import ifilter
+from json import loads
+from time import sleep
 
-from client             import Yad2Client
-from db                 import ApartmentDatabase
-from geo                import haversine_distance
-from log                import Log
-from notifiers.mail_notifier import MailNotifier
-from page_parser        import PageParser
-from re                 import findall, search
 import settings
-from win32com.client    import Dispatch
+from client import Yad2Client
+from db import ApartmentDatabase
+from geo import haversine_distance
+from log import Log
+from page_parser import PageParser
+from re import findall, search
+from win32com.client import Dispatch
 
 
 class Yad2Crawler(object):
@@ -28,13 +27,11 @@ class Yad2Crawler(object):
         if not settings.crawl_filter['noRealEstate']:
             self.apartment_type.append('Trade')
 
-
     def get_prid(self, html):
         hf = Dispatch('htmlfile')
         hf.writeln(html + "\n<script>document.write(\"<meta name='PRID' content='\" +genPid()+ \"'>\")</script>")
         prid = next(ifilter(lambda m: m.name == 'PRID', hf.getElementsByTagName('meta')), None)
         return prid.content if prid else None
-
 
     def get_prlst(self, html):
         prlst = ''
@@ -42,30 +39,30 @@ class Yad2Crawler(object):
             match = search('\d+', m)
             if match:
                 prlst += chr(int(match.group()))
-                
-        return prlst        
 
+        return prlst
 
-    def get_page(self, page = 1):
-        url = "http://m.yad2.co.il/API/MadorResults.php"    
+    def get_page(self, page=1):
+        url = "http://m.yad2.co.il/API/MadorResults.php"
 
         def transform_web_to_web_values(val):
             if type(val) == type(True):
                 return 1 if val else 0
             return val
 
-        fix_parameters = { k: transform_web_to_web_values(v) for k, v in settings.crawl_parameters.items() if v is not None }
+        fix_parameters = {k: transform_web_to_web_values(v) for k, v in settings.crawl_parameters.items() if
+                          v is not None}
         fix_parameters.update({"Page": page})
 
-        return self.client.get_url(url, args = fix_parameters)
-    
+        return self.client.get_url(url, args=fix_parameters)
 
     def crawl_apartments(self, json):
         for apr in json:
             if apr['Type'] != 'Ad':
                 continue
 
-            if not all([val in apr.keys() for val in ['latitude', 'longitude', 'RecordID', 'URL', 'img', 'Line1', 'Line2', 'Line3', 'Line4']]):
+            if not all([val in apr.keys() for val in
+                        ['latitude', 'longitude', 'RecordID', 'URL', 'img', 'Line1', 'Line2', 'Line3', 'Line4']]):
                 continue
 
             latitude = apr['latitude']
@@ -89,7 +86,7 @@ class Yad2Crawler(object):
             if not area:
                 self.log.debug(".. Filtering for no matching area")
                 continue
-            
+
             area_name = area[3]
 
             if (datetime.now() - datetime.strptime(date, "%d-%m-%Y")).days > settings.crawl_filter['maxAge']:
@@ -110,7 +107,6 @@ class Yad2Crawler(object):
 
             self.log.debug(".. OK")
 
-
     def notify_apartment(self, url, description, area):
         self.log.debug(".. Sending notification")
         data = self.get_apartment_page(url)
@@ -121,19 +117,19 @@ class Yad2Crawler(object):
         prid = None
 
         self.log.debug(".. Getting page %s", url)
-        
-        while errors:        
-            
+
+        while errors:
+
             html = self.client.get_url(url)
-            
+
             if "Please activate javascript to view this site" in html:
                 self.log.debug(".... Using IE to calculate PRID")
-                prid = self.get_prid(html)            
-                
+                prid = self.get_prid(html)
+
             elif "bot, spider, crawler" in html:
                 self.log.debug(".... Clearing cookies")
                 self.client.clear_cookies()
-  
+
             else:
                 prlst = self.get_prlst(html)
                 prid = prlst if prlst != '' else None
@@ -148,7 +144,6 @@ class Yad2Crawler(object):
     def create_apartment_body(self, html, url):
         pp = PageParser(html)
         return pp.create_apartment_page(url)
-
 
     def crawl(self):
         iteration_sleep = 0
@@ -178,7 +173,8 @@ class Yad2Crawler(object):
             except RuntimeError as e:
                 self.log.error(e)
                 break
-
+            except KeyboardInterrupt:
+                self.log.info("Stopping...")
             except Exception as e:
                 self.log.error(e)
                 iteration_sleep = settings.ITERATION_SLEEP_SEC_ERROR
